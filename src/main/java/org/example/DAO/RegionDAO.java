@@ -1,6 +1,6 @@
 package org.example.DAO;
 
-import org.example.Region;
+import org.example.entities.Region;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -49,9 +49,5 @@ public class RegionDAO {
             em.getTransaction().commit();
         }
         em.close();
-    }
-
-    public void close() {
-        emf.close();
     }
 }

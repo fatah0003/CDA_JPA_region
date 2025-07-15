@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.DAO.RegionDAO;
+import org.example.entities.Region;
 import org.example.util.enums.ClimatEnum;
 
 import java.util.List;
