@@ -1,53 +1,73 @@
 package org.example.DAO;
 
+
+
 import org.example.entities.Region;
+import org.example.util.DatabaseManager;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import java.sql.SQLException;
 import java.util.List;
 
 public class RegionDAO {
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa_exo_region");
 
-    public void create(Region region) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.persist(region);
-        em.getTransaction().commit();
-        em.close();
+    private EntityManager em;
+
+    public RegionDAO() {
+        this.em = DatabaseManager.getEntityManager();
     }
 
-    public Region findById(int id) {
-        EntityManager em = emf.createEntityManager();
-        Region region = em.find(Region.class, id);
-        em.close();
-        return region;
-    }
-
-    public List<Region> findAll() {
-        EntityManager em = emf.createEntityManager();
-        List<Region> regions = em.createQuery("SELECT r FROM Region r", Region.class).getResultList();
-        em.close();
-        return regions;
-    }
-
-    public void update(Region region) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.merge(region);
-        em.getTransaction().commit();
-        em.close();
-    }
-
-    public void delete(int id) {
-        EntityManager em = emf.createEntityManager();
-        Region region = em.find(Region.class, id);
-        if (region != null) {
+    public Region save (Region region){
+        try{
             em.getTransaction().begin();
-            em.remove(region);
+            em.persist(region);
             em.getTransaction().commit();
+            return region;
+        }catch (Exception e){
+            em.getTransaction().rollback();
+            return null;
         }
-        em.close();
+    }
+
+    public Region get (long id){
+        return em.find(Region.class,id);
+    }
+
+    public List<Region> get (){
+        return em.createQuery("select r from Region r ", Region.class).getResultList();
+    }
+
+    public Region update (Region region , long id){
+        try{
+            Region regionFound = get(id);
+            if(regionFound != null){
+                em.getTransaction().begin();
+                regionFound.setNom(region.getNom());
+                regionFound.setSurface(region.getSurface());
+                regionFound.setClimat(region.getClimat());
+                em.getTransaction().commit();
+                return regionFound;
+            }
+            return null;
+        }catch (Exception e){
+            em.getTransaction().rollback();
+            return null;
+        }
+    }
+
+    public boolean delete (long id){
+        try{
+            Region regionFound = get(id);
+            if(regionFound != null){
+                em.getTransaction().begin();
+                em.remove(regionFound);
+                em.getTransaction().commit();
+                return true;
+            }
+            return false;
+        }catch (Exception e){
+            em.getTransaction().rollback();
+            return false;
+        }
     }
 }
